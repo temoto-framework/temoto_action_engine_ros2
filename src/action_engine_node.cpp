@@ -1,8 +1,10 @@
 #include <cstdio>
-#include "temoto_action_engine/action_engine.h"
+#include <temoto_action_engine/action_engine.h>
 
 int main(int argc, char ** argv)
 {
+  ActionEngine ae;
+
   (void) argc;
   (void) argv;
 
