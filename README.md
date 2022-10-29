@@ -3,6 +3,11 @@ ROS2 wrapper for TeMoto Action Engine
 
 ## Installation Instructions
 ```bash
+# Get the dependencies
+sudo apt install libclass-loader-dev
+```
+
+```bash
 # Go to the source folder your ROS2 workspace
 cd <PATH-TO-YOUR-ROS2-WS>/src
 
