@@ -34,5 +34,12 @@ Run the Action Engine
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 # Run the Action Engine
-ros2 run temoto_action_engine_ros2 action_engine_node
+ros2 run temoto_action_engine_ros2 action_engine_node --wake-word Johnny --actions-path <ros2_ws>/src/temoto_action_engine_ros2/temoto_action_engine/build/
+
+# Invoke a UMRF graph
+ros2 run temoto_action_engine_ros2 umrf_graph_publisher --target Johnny --umrf-graph-path <ros2_ws>/src/temoto_action_engine_ros2/temoto_action_engine/examples/umrf_graphs/example_1.umrfg.json
+
+# Stop the graph
+ros2 topic pub /broadcast_stop_umrf_graph --once temoto_action_engine_ros2/msg/BroadcastStopUmrfGraph 'umrf_graph_name: 'umrf_graph_loop'
+targets: [Johnny]'
 ```

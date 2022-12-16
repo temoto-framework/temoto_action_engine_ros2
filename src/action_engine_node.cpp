@@ -133,6 +133,7 @@ void ActionEngineNode::stopUmrfGraphCb(const BroadcastStopUmrfGraph::SharedPtr m
   try
   {
     ae_.stopUmrfGraph(msg->umrf_graph_name);
+    RCLCPP_INFO(this->get_logger(), "UMRF graph '%s' stopped.", msg->umrf_graph_name.c_str());
   }
   catch(const std::exception& e)
   {
