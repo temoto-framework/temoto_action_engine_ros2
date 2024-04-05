@@ -23,6 +23,10 @@
 #include "temoto_action_engine_ros2/msg/broadcast_start_umrf_graph.hpp"
 #include "temoto_action_engine_ros2/msg/broadcast_stop_umrf_graph.hpp"
 
+#include "temoto_action_engine_ros2/srv/start_umrf_graph.hpp"
+#include "temoto_action_engine_ros2/srv/stop_umrf_graph.hpp"
+#include "temoto_action_engine_ros2/srv/get_umrf_graphs.hpp"
+
 using namespace temoto_action_engine_ros2::msg;
 
 class ActionEngineNode : public rclcpp::Node
@@ -37,12 +41,26 @@ private:
 
   bool containsWakeWord(const std::vector<std::string>& wake_words_in) const;
 
+  void StartUmrfGraphSrvCb(const std::shared_ptr<temoto_action_engine_ros2::srv::StartUmrfGraph::Request> req
+  , const std::shared_ptr<temoto_action_engine_ros2::srv::StartUmrfGraph::Response> res);
+
+  void StopUmrfGraphSrvCb(const std::shared_ptr<temoto_action_engine_ros2::srv::StopUmrfGraph::Request> req
+  , const std::shared_ptr<temoto_action_engine_ros2::srv::StopUmrfGraph::Response> res);
+
+  void GetUmrfGraphsCb(const std::shared_ptr<temoto_action_engine_ros2::srv::GetUmrfGraphs::Request> req
+  , const std::shared_ptr<temoto_action_engine_ros2::srv::GetUmrfGraphs::Response> res);
+
   ActionEngine ae_;
   action_engine::ArgParser arg_parser_;
   std::vector<std::string> wake_words_;
   std::vector<std::string> action_paths_;
   rclcpp::Subscription<BroadcastStartUmrfGraph>::SharedPtr start_umrf_graph_sub_;
   rclcpp::Subscription<BroadcastStopUmrfGraph>::SharedPtr stop_umrf_graph_sub_;
+
+  rclcpp::Service<temoto_action_engine_ros2::srv::StartUmrfGraph>::SharedPtr start_umrf_graph_srv_;
+  rclcpp::Service<temoto_action_engine_ros2::srv::StopUmrfGraph>::SharedPtr stop_umrf_graph_srv_;
+  rclcpp::Service<temoto_action_engine_ros2::srv::GetUmrfGraphs>::SharedPtr get_umrf_graphs_server_;
+
   std::mutex start_umrf_graph_mutex_;
   std::mutex stop_umrf_graph_mutex_;
 };

@@ -26,6 +26,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/UmrfGraphDiff.msg"
   "msg/BroadcastStartUmrfGraph.msg"
   "msg/BroadcastStopUmrfGraph.msg"
+  "srv/StartUmrfGraph.srv"
+  "srv/StopUmrfGraph.srv"
+  "srv/GetUmrfGraphs.srv"
 )
 
 ament_export_dependencies(rosidl_default_runtime)

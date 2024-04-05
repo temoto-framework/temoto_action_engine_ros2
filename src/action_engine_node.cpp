@@ -1,7 +1,10 @@
 #include "temoto_action_engine_ros2/action_engine_node.hpp"
 #include <temoto_action_engine/umrf_json_converter.h>
 
-using std::placeholders::_1;
+
+
+// using std::placeholders::_1;
+using namespace std::placeholders;
 
 ActionEngineNode::ActionEngineNode(int argc, char** argv)
 : Node("action_engine_node")
@@ -54,6 +57,18 @@ ActionEngineNode::ActionEngineNode(int argc, char** argv)
 
   stop_umrf_graph_sub_ = this->create_subscription<BroadcastStopUmrfGraph>(
     "broadcast_stop_umrf_graph", 1, std::bind(&ActionEngineNode::stopUmrfGraphCb, this, _1));
+
+  start_umrf_graph_srv_ = this->create_service<temoto_action_engine_ros2::srv::StartUmrfGraph>(
+    "start_umrf_graph", std::bind(&ActionEngineNode::StartUmrfGraphSrvCb, this, std::placeholders::_1, std::placeholders::_2)
+  );
+
+  stop_umrf_graph_srv_ = this->create_service<temoto_action_engine_ros2::srv::StopUmrfGraph>(
+    "stop_umrf_graph", std::bind(&ActionEngineNode::StopUmrfGraphSrvCb, this, std::placeholders::_1, std::placeholders::_2)
+  );
+
+  get_umrf_graphs_server_ = this->create_service<temoto_action_engine_ros2::srv::GetUmrfGraphs>(
+    "get_umrf_graphs", std::bind(&ActionEngineNode::GetUmrfGraphsCb, this, std::placeholders::_1, std::placeholders::_2)
+  );
 
   // Start the Action Engine
   ae_.start();
@@ -154,6 +169,44 @@ bool ActionEngineNode::containsWakeWord(const std::vector<std::string>& wake_wor
     }
   }
   return false;
+}
+
+void ActionEngineNode::StartUmrfGraphSrvCb(const std::shared_ptr<temoto_action_engine_ros2::srv::StartUmrfGraph::Request> req
+, const std::shared_ptr<temoto_action_engine_ros2::srv::StartUmrfGraph::Response> res)
+try
+{
+  std::lock_guard<std::mutex> lock(start_umrf_graph_mutex_);
+  RCLCPP_INFO(this->get_logger(), "Starting UMRF graph '%s' ...", req->umrf_graph_name.c_str());
+  UmrfGraph umrf_graph = umrf_json_converter::fromUmrfGraphJsonStr(req->umrf_graph_json);
+  ae_.executeUmrfGraph(umrf_graph, bool(req->name_match_required));
+
+  res->success = true;
+}
+catch(const std::exception& e)
+{
+  RCLCPP_INFO(this->get_logger(), std::string(e.what()).c_str());
+  res->success = false;
+}
+
+void ActionEngineNode::StopUmrfGraphSrvCb(const std::shared_ptr<temoto_action_engine_ros2::srv::StopUmrfGraph::Request> req
+, const std::shared_ptr<temoto_action_engine_ros2::srv::StopUmrfGraph::Response> res)
+try
+{
+  std::lock_guard<std::mutex> lock(stop_umrf_graph_mutex_);
+  RCLCPP_INFO(this->get_logger(), "Stopping UMRF graph '%s' ...", req->umrf_graph_name.c_str());
+  ae_.stopUmrfGraph(req->umrf_graph_name);
+  res->success = true;
+}
+catch(const std::exception& e)
+{
+  RCLCPP_INFO(this->get_logger(), std::string(e.what()).c_str());
+  res->success = false;
+}
+
+void ActionEngineNode::GetUmrfGraphsCb(const std::shared_ptr<temoto_action_engine_ros2::srv::GetUmrfGraphs::Request> req
+, const std::shared_ptr<temoto_action_engine_ros2::srv::GetUmrfGraphs::Response> res)
+{
+  res->umrf_graph_jsons = ae_.getGraphJsons(req->requested_graphs);
 }
 
 int main(int argc, char** argv)
