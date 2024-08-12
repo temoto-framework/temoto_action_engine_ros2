@@ -21,6 +21,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(temoto_action_engine REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(class_loader REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/UmrfGraphDiff.msg"
@@ -55,6 +56,7 @@ ament_target_dependencies(action_engine_node
 
 target_link_libraries(action_engine_node
   temoto_action_engine
+  class_loader
 )
 
 rosidl_target_interfaces(action_engine_node
@@ -78,6 +80,7 @@ ament_target_dependencies(umrf_graph_publisher
 
 target_link_libraries(umrf_graph_publisher
   temoto_action_engine
+  class_loader
 )
 
 rosidl_target_interfaces(umrf_graph_publisher
