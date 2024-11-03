@@ -23,6 +23,8 @@
 #include "temoto_action_engine_ros2/msg/broadcast_start_umrf_graph.hpp"
 #include "temoto_action_engine_ros2/msg/broadcast_stop_umrf_graph.hpp"
 
+#include <memory>
+
 using namespace temoto_action_engine_ros2::msg;
 
 class ActionEngineNode : public rclcpp::Node
@@ -37,7 +39,7 @@ private:
 
   bool containsWakeWord(const std::vector<std::string>& wake_words_in) const;
 
-  ActionEngine ae_;
+  std::unique_ptr<ActionEngine> ae_;
   action_engine::ArgParser arg_parser_;
   std::vector<std::string> wake_words_;
   std::vector<std::string> action_paths_;

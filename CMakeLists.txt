@@ -1,15 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(temoto_action_engine_ros2)
 
-# Default to C99
-if(NOT CMAKE_C_STANDARD)
-  set(CMAKE_C_STANDARD 99)
-endif()
-
-# Default to C++14
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
-endif()
+add_compile_options(-std=c++17)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -34,7 +26,6 @@ set(headers
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
   ${CMAKE_CURRENT_SOURCE_DIR}/temoto_action_engine/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/temoto_action_engine/rapidjson/include
 )
 
 #
@@ -63,25 +54,25 @@ install(TARGETS action_engine_node
 #
 # UMRF graph publisher node
 #
-add_executable(umrf_graph_publisher src/umrf_graph_publisher.cpp)
-target_include_directories(umrf_graph_publisher PUBLIC
-  ${headers})
+# add_executable(umrf_graph_publisher src/umrf_graph_publisher.cpp)
+# target_include_directories(umrf_graph_publisher PUBLIC
+#   ${headers})
 
-ament_target_dependencies(umrf_graph_publisher
-  rclcpp
-  std_msgs
-  temoto_action_engine
-)
+# ament_target_dependencies(umrf_graph_publisher
+#   rclcpp
+#   std_msgs
+#   temoto_action_engine
+# )
 
-target_link_libraries(umrf_graph_publisher
-  temoto_action_engine
-)
+# target_link_libraries(umrf_graph_publisher
+#   temoto_action_engine
+# )
 
-rosidl_target_interfaces(umrf_graph_publisher
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+# rosidl_target_interfaces(umrf_graph_publisher
+#   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
-install(TARGETS umrf_graph_publisher
-  DESTINATION lib/${PROJECT_NAME})
+# install(TARGETS umrf_graph_publisher
+#   DESTINATION lib/${PROJECT_NAME})
 
 
 if(BUILD_TESTING)
