@@ -2,7 +2,7 @@
 #include "temoto_action_engine/temoto_error.h"
 #include "temoto_action_engine/umrf_json_converter.h"
 #include "temoto_action_engine/umrf_graph_fs.h"
-#include "temoto_action_engine_ros2/msg/broadcast_start_umrf_graph.hpp"
+#include "temoto_action_engine_ros2/msg/umrf_graph_start.hpp"
 
 #include <boost/program_options.hpp>
 #include <exception>
@@ -52,9 +52,9 @@ int main(int argc, char** argv)
 	rclcpp::init(argc, argv);
 	std::shared_ptr<rclcpp::Node> node = std::make_shared<rclcpp::Node>("umrf_graph_publisher");
 
-	rclcpp::Publisher<BroadcastStartUmrfGraph>::SharedPtr umrf_graph_pub;
+	rclcpp::Publisher<UmrfGraphStart>::SharedPtr umrf_graph_pub;
 	umrf_graph_pub =
-      node->create_publisher<BroadcastStartUmrfGraph>("/broadcast_start_umrf_graph", 10);
+      node->create_publisher<UmrfGraphStart>("/broadcast_start_umrf_graph", 10);
 
 	/*
 	 * Read the UMRF Graph JSON
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 	/*
 	 * Create UMRF Graph ROS message
 	 */
-	auto ujg_msg = BroadcastStartUmrfGraph();
+	auto ujg_msg = UmrfGraphStart();
 	ujg_msg.umrf_graph_name = umrf_graph.getName();
 	ujg_msg.name_match_required = 1;
 	ujg_msg.targets.push_back(target);

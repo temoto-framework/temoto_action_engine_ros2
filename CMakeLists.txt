@@ -15,9 +15,10 @@ find_package(temoto_action_engine REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/UmrfGraphStart.msg"
+  "msg/UmrfGraphStop.msg"
   "msg/UmrfGraphDiff.msg"
-  "msg/BroadcastStartUmrfGraph.msg"
-  "msg/BroadcastStopUmrfGraph.msg"
+  "msg/UmrfGraphFeedback.msg"
 )
 
 ament_export_dependencies(rosidl_default_runtime)
@@ -28,9 +29,6 @@ set(headers
   ${CMAKE_CURRENT_SOURCE_DIR}/temoto_action_engine/include
 )
 
-#
-# Action Engine node
-#
 add_executable(action_engine_node src/action_engine_node.cpp)
 target_include_directories(action_engine_node PUBLIC
   ${headers})
@@ -50,40 +48,5 @@ rosidl_target_interfaces(action_engine_node
 
 install(TARGETS action_engine_node
   DESTINATION lib/${PROJECT_NAME})
-
-#
-# UMRF graph publisher node
-#
-# add_executable(umrf_graph_publisher src/umrf_graph_publisher.cpp)
-# target_include_directories(umrf_graph_publisher PUBLIC
-#   ${headers})
-
-# ament_target_dependencies(umrf_graph_publisher
-#   rclcpp
-#   std_msgs
-#   temoto_action_engine
-# )
-
-# target_link_libraries(umrf_graph_publisher
-#   temoto_action_engine
-# )
-
-# rosidl_target_interfaces(umrf_graph_publisher
-#   ${PROJECT_NAME} "rosidl_typesupport_cpp")
-
-# install(TARGETS umrf_graph_publisher
-#   DESTINATION lib/${PROJECT_NAME})
-
-
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # uncomment the line when a copyright and license is not present in all source files
-  #set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # uncomment the line when this package is not in a git repo
-  #set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
-endif()
 
 ament_package()
