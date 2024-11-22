@@ -16,9 +16,8 @@ git clone --recursive https://github.com/temoto-framework/temoto_action_engine_r
 
 # Build the core librart of the action engine
 # NB: DON'T SOURCE YOUR ROS2 ENVIRONMENT YET
-cd temoto_action_engine_ros2/temoto_action_engine
-mkdir build && cd build && cmake .. && make
-sudo make install
+cd temoto_action_engine_ros2/temoto_action_engine_ros2/temoto_action_engine
+mkdir build && cd build && cmake .. && sudo make install
 
 # Build it
 cd <PATH-TO-YOUR-ROS2-WS>
@@ -27,19 +26,18 @@ colcon build
 ```
 
 ### In Progress
-Run the Action Engine
+Run the examples
 
 ```bash
-# Set the libraries path, so that the libtemoto_action_engine.so is picked up from /usr/local/lib
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-
 # Run the Action Engine
-ros2 run temoto_action_engine_ros2 action_engine_node --wake-word Johnny --actions-path <ros2_ws>/src/temoto_action_engine_ros2/temoto_action_engine/build/
+ros2 run temoto_action_engine_ros2 action_engine_node \
+--actor-name David \
+--actions-path src/temoto_action_engine_ros2/examples
 
 # Invoke a UMRF graph
-ros2 run temoto_action_engine_ros2 umrf_graph_publisher --target Johnny --umrf-graph-path <ros2_ws>/src/temoto_action_engine_ros2/temoto_action_engine/examples/umrf_graphs/example_1.umrfg.json
-
-# Stop the graph
-ros2 topic pub /broadcast_stop_umrf_graph --once temoto_action_engine_ros2/msg/BroadcastStopUmrfGraph 'umrf_graph_name: 'umrf_graph_loop'
-targets: [Johnny]'
+ros2 topic pub /umrf_graph_start --once temoto_msgs/msg/UmrfGraphStart "umrf_graph_name: 'example_sequential_nav'  
+name_match_required: false  
+targets: [David]
+umrf_graph_json: ''  
+umrf_graph_diffs: []"
 ```

@@ -2,9 +2,9 @@
 #include <temoto_action_engine/arg_parser.h>
 #include <temoto_action_engine/umrf_json.h>
 
-#include "temoto_action_engine_ros2/msg/umrf_graph_start.hpp"
-#include "temoto_action_engine_ros2/msg/umrf_graph_stop.hpp"
-#include "temoto_action_engine_ros2/msg/umrf_graph_feedback.hpp"
+#include "temoto_msgs/msg/umrf_graph_start.hpp"
+#include "temoto_msgs/msg/umrf_graph_stop.hpp"
+#include "temoto_msgs/msg/umrf_graph_feedback.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
@@ -13,7 +13,7 @@
 
 using std::placeholders::_1;
 
-using namespace temoto_action_engine_ros2::msg;
+using namespace temoto_msgs::msg;
 
 class ActionEngineNode : public rclcpp::Node
 {
@@ -79,6 +79,12 @@ public:
   {
     feedback_reader_thread_stop_ = true;
     feedback_reader_thread_.join();
+
+    // TODO: Create a manager thread, which joins the graph-wait threads continuously
+    for (auto& t : wait_thread_pool_)
+    {
+      t.join();
+    }
   }
 
 private:
@@ -132,7 +138,13 @@ private:
       UmrfGraph umrf_graph = umrf_json::fromUmrfGraphJsonStr(msg->umrf_graph_json);
       ae_->executeUmrfGraphA(umrf_graph, "on_true", bool(msg->name_match_required));
     }
-    
+
+    wait_thread_pool_.push_back(std::move(std::thread([&, gn = msg->umrf_graph_name]
+    {
+      ae_->waitForGraph(gn);
+      RCLCPP_INFO(this->get_logger(), "Graph '%s' finished.", gn.c_str());
+    })));
+
     // else if (!msg->umrf_graph_diffs.empty())
     // {
     //   /*
@@ -213,6 +225,8 @@ private:
   rclcpp::Publisher<UmrfGraphFeedback>::SharedPtr umrf_graph_feedback_pub;
   std::thread feedback_reader_thread_;
   bool feedback_reader_thread_stop_;
+
+  std::vector<std::thread> wait_thread_pool_;
 };
 
 int main(int argc, char** argv)
