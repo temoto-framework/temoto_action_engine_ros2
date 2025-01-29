@@ -5,6 +5,7 @@
 #include "temoto_msgs/msg/umrf_graph_start.hpp"
 #include "temoto_msgs/msg/umrf_graph_stop.hpp"
 #include "temoto_msgs/msg/umrf_graph_feedback.hpp"
+#include "temoto_msgs/srv/umrf_graph_get.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
@@ -12,8 +13,10 @@
 #include <thread>
 
 using std::placeholders::_1;
+using std::placeholders::_2;
 
 using namespace temoto_msgs::msg;
+using namespace temoto_msgs::srv;
 
 class ActionEngineNode : public rclcpp::Node
 {
@@ -69,6 +72,9 @@ public:
 
     umrf_graph_feedback_pub = this->create_publisher<UmrfGraphFeedback>(
       "/umrf_graph_feedback", 10);
+
+    umrf_graph_get_srv_ = this->create_service<UmrfGraphGet>(
+      "umrf_graph_get", std::bind(&ActionEngineNode::umrfGraphGetCb, this, _1, _2));
 
     startFeedbackLoop();
 
@@ -196,6 +202,12 @@ private:
     }
   }
 
+  void umrfGraphGetCb(const UmrfGraphGet::Request::SharedPtr, const UmrfGraphGet::Response::SharedPtr response)
+  {
+    response->graph_jsons_indexed = ae_->getGraphJsonsIndexed();
+    response->graph_jsons_running = ae_->getGraphJsonsRunning();
+  }
+
   bool containsWakeWord(const std::vector<std::string>& wake_words_in) const
   {
     for (const auto& target : wake_words_in)
@@ -225,6 +237,8 @@ private:
   rclcpp::Publisher<UmrfGraphFeedback>::SharedPtr umrf_graph_feedback_pub;
   std::thread feedback_reader_thread_;
   bool feedback_reader_thread_stop_;
+
+  rclcpp::Service<UmrfGraphGet>::SharedPtr umrf_graph_get_srv_;
 
   std::vector<std::thread> wait_thread_pool_;
 };

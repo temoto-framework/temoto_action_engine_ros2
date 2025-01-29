@@ -1,3 +1,3 @@
-string[] graph_names # All graphs are returnued if empty
 ---
-string[] graph_jsons
+string[] graph_jsons_indexed
+string[] graph_jsons_running
