@@ -39,7 +39,10 @@
           "name": "ExampleNavigate",
           "instance_id": 1
         }
-      ]
+      ],
+      "gui_attributes": {
+        "position": { "x": 0, "y": -50 }
+      }
     },
     {
       "name": "ExampleNavigate",
@@ -72,7 +75,10 @@
           "name": "ExampleNavigate",
           "instance_id": 2
         }
-      ]
+      ],
+      "gui_attributes": {
+        "position": { "x": 0, "y": 50 }
+      }
     },
     {
       "name": "ExampleNavigate",
@@ -99,7 +105,10 @@
           "name": "ExampleNavigate",
           "instance_id": 1
         }
-      ]
+      ],
+      "gui_attributes": {
+        "position": { "x": 0, "y": 150 }
+      }
     }
   ]
 }
