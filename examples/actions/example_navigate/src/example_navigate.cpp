@@ -1,4 +1,3 @@
-#include <class_loader/class_loader.hpp>
 #include "example_navigate/temoto_action.hpp"
 
 #include <fmt/core.h>
@@ -65,5 +64,9 @@ void onStop()
 
 }; // ExampleNavigate class
 
-/* REQUIRED BY CLASS LOADER */
-CLASS_LOADER_REGISTER_CLASS(ExampleNavigate, ActionBase);
+boost::shared_ptr<ActionBase> factory()
+{
+    return boost::shared_ptr<ExampleNavigate>(new ExampleNavigate());
+}
+
+BOOST_DLL_ALIAS(factory, ExampleNavigate)

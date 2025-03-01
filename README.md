@@ -4,7 +4,7 @@ ROS2 wrapper for TeMoto Action Engine
 ## Installation Instructions
 ```bash
 # Get the dependencies
-sudo apt install libclass-loader-dev
+sudo apt install libboost-all-dev
 ```
 
 ```bash
@@ -13,11 +13,6 @@ cd <PATH-TO-YOUR-ROS2-WS>/src
 
 # Download this repository
 git clone --recursive https://github.com/temoto-framework/temoto_action_engine_ros2
-
-# Build the core librart of the action engine
-# NB: DON'T SOURCE YOUR ROS2 ENVIRONMENT YET
-cd temoto_action_engine_ros2/temoto_action_engine_ros2/temoto_action_engine
-mkdir build && cd build && cmake .. && sudo make install
 
 # Build it
 cd <PATH-TO-YOUR-ROS2-WS>

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(temoto_action_engine_ros2)
 
-add_compile_options(-std=c++17 -g)
+add_compile_options(-std=gnu++20 -g)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -11,7 +11,8 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(temoto_msgs REQUIRED)
-find_package(temoto_action_engine REQUIRED)
+
+add_subdirectory(temoto_action_engine)
 
 set(headers
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -26,12 +27,13 @@ target_include_directories(action_engine_node PUBLIC
 ament_target_dependencies(action_engine_node
   rclcpp
   temoto_msgs
-  temoto_action_engine
 )
 
 target_link_libraries(action_engine_node
   temoto_action_engine
 )
+
+ament_export_include_directories(${CMAKE_CURRENT_SOURCE_DIR}/temoto_action_engine/include)
 
 install(TARGETS action_engine_node
   DESTINATION lib/${PROJECT_NAME})
