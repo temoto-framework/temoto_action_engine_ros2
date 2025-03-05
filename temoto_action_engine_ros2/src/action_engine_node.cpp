@@ -5,6 +5,7 @@
 #include "temoto_msgs/msg/umrf_graph_start.hpp"
 #include "temoto_msgs/msg/umrf_graph_stop.hpp"
 #include "temoto_msgs/msg/umrf_graph_feedback.hpp"
+
 #include "temoto_msgs/srv/umrf_graph_get.hpp"
 
 #include "rclcpp/rclcpp.hpp"
@@ -21,6 +22,7 @@ using namespace temoto_msgs::srv;
 class ActionEngineNode : public rclcpp::Node
 {
 public:
+
   ActionEngineNode(int argc, char** argv)
   : Node("action_engine_node")
   , arg_parser_(argc, argv)
@@ -204,6 +206,7 @@ private:
 
   void umrfGraphGetCb(const UmrfGraphGet::Request::SharedPtr, const UmrfGraphGet::Response::SharedPtr response)
   {
+    response->umrf_jsons = ae_->getUmrfJsons();
     response->graph_jsons_indexed = ae_->getGraphJsonsIndexed();
     response->graph_jsons_running = ae_->getGraphJsonsRunning();
   }
