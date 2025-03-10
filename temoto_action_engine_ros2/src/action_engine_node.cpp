@@ -4,6 +4,8 @@
 
 #include "temoto_msgs/msg/umrf_graph_start.hpp"
 #include "temoto_msgs/msg/umrf_graph_stop.hpp"
+#include "temoto_msgs/msg/umrf_graph_pause.hpp"
+#include "temoto_msgs/msg/umrf_graph_resume.hpp"
 #include "temoto_msgs/msg/umrf_graph_feedback.hpp"
 
 #include "temoto_msgs/srv/umrf_graph_get.hpp"
@@ -72,6 +74,12 @@ public:
     umrf_graph_stop_sub_ = this->create_subscription<UmrfGraphStop>(
       "/umrf_graph_stop", 1, std::bind(&ActionEngineNode::UmrfGraphStopCb, this, _1));
 
+    umrf_graph_pause_sub_ = this->create_subscription<UmrfGraphPause>(
+      "/umrf_pause_pause", 1, std::bind(&ActionEngineNode::UmrfGraphPauseCb, this, _1));
+
+    umrf_graph_resume_sub_ = this->create_subscription<UmrfGraphResume>(
+      "/umrf_graph_resume", 1, std::bind(&ActionEngineNode::UmrfGraphResumeCb, this, _1));
+
     umrf_graph_feedback_pub = this->create_publisher<UmrfGraphFeedback>(
       "/umrf_graph_feedback", 10);
 
@@ -124,7 +132,6 @@ private:
   void UmrfGraphStartCb(const UmrfGraphStart::SharedPtr msg)
   try
   {
-    std::lock_guard<std::mutex> lock(start_umrf_graph_mutex_);
     RCLCPP_INFO(this->get_logger(), "Received request to start UMRF graph: %s", msg->umrf_graph_name.c_str());
 
     // If the wake word was not found then return
@@ -182,7 +189,6 @@ private:
 
   void UmrfGraphStopCb(const UmrfGraphStop::SharedPtr msg)
   {
-    std::lock_guard<std::mutex> lock(stop_umrf_graph_mutex_);
     RCLCPP_INFO(this->get_logger(), "Received request to stop UMRF graph: %s", msg->umrf_graph_name.c_str());
 
     // If the wake word was not found then return
@@ -202,6 +208,14 @@ private:
     {
       RCLCPP_INFO(this->get_logger(), std::string(e.what()).c_str());
     }
+  }
+
+  void UmrfGraphPauseCb(const UmrfGraphPause::SharedPtr msg)
+  {
+  }
+
+  void UmrfGraphResumeCb(const UmrfGraphResume::SharedPtr msg)
+  {
   }
 
   void umrfGraphGetCb(const UmrfGraphGet::Request::SharedPtr, const UmrfGraphGet::Response::SharedPtr response)
@@ -231,13 +245,12 @@ private:
   std::vector<std::string> wake_words_;
   std::vector<std::string> action_paths_;
 
-  rclcpp::Subscription<UmrfGraphStart>::SharedPtr umrf_graph_start_sub_;
-  std::mutex start_umrf_graph_mutex_;
+  rclcpp::Subscription<UmrfGraphStart>::SharedPtr  umrf_graph_start_sub_;
+  rclcpp::Subscription<UmrfGraphStop>::SharedPtr   umrf_graph_stop_sub_;
+  rclcpp::Subscription<UmrfGraphPause>::SharedPtr  umrf_graph_pause_sub_;
+  rclcpp::Subscription<UmrfGraphResume>::SharedPtr umrf_graph_resume_sub_;
+  rclcpp::Publisher<UmrfGraphFeedback>::SharedPtr  umrf_graph_feedback_pub;
 
-  rclcpp::Subscription<UmrfGraphStop>::SharedPtr umrf_graph_stop_sub_;
-  std::mutex stop_umrf_graph_mutex_;
-
-  rclcpp::Publisher<UmrfGraphFeedback>::SharedPtr umrf_graph_feedback_pub;
   std::thread feedback_reader_thread_;
   bool feedback_reader_thread_stop_;
 

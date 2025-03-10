@@ -19,7 +19,10 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/UmrfGraphStart.msg"
   "msg/UmrfGraphStop.msg"
-  "msg/UmrfGraphDiff.msg"
+  "msg/UmrfGraphPause.msg"
+  "msg/UmrfGraphResume.msg"
+  "msg/UmrfGraphModify.msg"
+  "msg/UmrfGraphModifier.msg"
   "msg/UmrfGraphFeedback.msg"
 
   "srv/UmrfGraphGet.srv"
