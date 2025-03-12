@@ -144,17 +144,21 @@ private:
     /*
      * Check wether it's a diff request or new graph request
      */
+    std::string graph_name;
+
     if (msg->umrf_graph_json.empty())
     {
-      ae_->executeUmrfGraph(msg->umrf_graph_name);
+      graph_name = msg->umrf_graph_name;
+      ae_->executeUmrfGraph(graph_name);
     }
     else
     {
       UmrfGraph umrf_graph = umrf_json::fromUmrfGraphJsonStr(msg->umrf_graph_json);
+      graph_name = umrf_graph.getName();
       ae_->executeUmrfGraphA(umrf_graph, "on_true", bool(msg->name_match_required));
     }
 
-    wait_thread_pool_.push_back(std::move(std::thread([&, gn = msg->umrf_graph_name]
+    wait_thread_pool_.push_back(std::move(std::thread([&, gn = graph_name]
     {
       ae_->waitForGraph(gn);
       RCLCPP_INFO(this->get_logger(), "Graph '%s' finished.", gn.c_str());
