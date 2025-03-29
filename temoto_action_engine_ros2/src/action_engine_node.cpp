@@ -32,14 +32,15 @@ public:
     /*
      * Get the wake words and actions path
      */
-    wake_words_ = arg_parser_.getWakeWords();
-    action_paths_ = arg_parser_.getActionPaths();
+    wake_words_    = arg_parser_.getWakeWords();
+    action_paths_  = arg_parser_.getActionPaths();
+    indexing_rate_ = arg_parser_.getIndexingRate();
 
     std::cout << " Initializing the Action Engine" << std::endl;
     std::cout << " - ACTOR NAME   : " << wake_words_.at(0) << std::endl;
     std::cout << " - ACTIONS PATH : " << action_paths_.at(0) << std::endl;
 
-    ae_ = std::make_unique<ActionEngine>(wake_words_.at(0));
+    ae_ = std::make_unique<ActionEngine>(wake_words_.at(0), indexing_rate_);
 
     /*
      * Check if the paths contain any TeMoto actions
@@ -60,7 +61,7 @@ public:
       }
     }
 
-    if (successful_paths == 0)
+    if (indexing_rate_ == 0 && successful_paths == 0)
     {
       throw CREATE_TEMOTO_ERROR("None of the indicated directories contained TeMoto actions, exiting.");
     }
@@ -248,6 +249,7 @@ private:
   action_engine::ArgParser arg_parser_;
   std::vector<std::string> wake_words_;
   std::vector<std::string> action_paths_;
+  unsigned int indexing_rate_;
 
   rclcpp::Subscription<UmrfGraphStart>::SharedPtr  umrf_graph_start_sub_;
   rclcpp::Subscription<UmrfGraphStop>::SharedPtr   umrf_graph_stop_sub_;
