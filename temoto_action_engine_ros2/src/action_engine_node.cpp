@@ -1,12 +1,13 @@
 #include <temoto_action_engine/action_engine.h>
-#include <temoto_action_engine/arg_parser.h>
 #include <temoto_action_engine/umrf_json.h>
+#include <temoto_action_engine/util/arg_parser.hpp>
 
 #include "temoto_msgs/msg/umrf_graph_start.hpp"
 #include "temoto_msgs/msg/umrf_graph_stop.hpp"
 #include "temoto_msgs/msg/umrf_graph_pause.hpp"
 #include "temoto_msgs/msg/umrf_graph_resume.hpp"
 #include "temoto_msgs/msg/umrf_graph_feedback.hpp"
+#include "temoto_msgs/msg/umrf_graph_modify.hpp"
 
 #include "temoto_msgs/srv/umrf_graph_get.hpp"
 
@@ -81,6 +82,9 @@ public:
     umrf_graph_resume_sub_ = this->create_subscription<UmrfGraphResume>(
       "/umrf_graph_resume", 1, std::bind(&ActionEngineNode::UmrfGraphResumeCb, this, _1));
 
+    umrf_graph_modify_sub_ = this->create_subscription<UmrfGraphModify>(
+      "/umrf_graph_modify", 1, std::bind(&ActionEngineNode::UmrfGraphModifyCb, this, _1));
+
     umrf_graph_feedback_pub = this->create_publisher<UmrfGraphFeedback>(
       "/umrf_graph_feedback", 10);
 
@@ -130,6 +134,10 @@ private:
     });
   }
 
+  /* * * * * * * * * * * * * * * * * * * * * * *
+   * Start graph
+   * * * * * * * * * * * * * * * * * * * * * * */
+
   void UmrfGraphStartCb(const UmrfGraphStart::SharedPtr msg)
   try
   {
@@ -142,9 +150,6 @@ private:
       return;
     }
 
-    /*
-     * Check wether it's a diff request or new graph request
-     */
     std::string graph_name;
 
     if (msg->umrf_graph_json.empty())
@@ -164,33 +169,15 @@ private:
       ae_->waitForGraph(gn);
       RCLCPP_INFO(this->get_logger(), "Graph '%s' finished.", gn.c_str());
     })));
-
-    // else if (!msg->umrf_graph_diffs.empty())
-    // {
-    //   /*
-    //    * Modify an existing umrf graph according to the diff specifiers
-    //    */
-    //   try
-    //   {
-    //     UmrfGraphDiffs umrf_graph_diffs;
-    //     for(const auto& umrf_graph_diff_msg : msg->umrf_graph_diffs)
-    //     {
-    //       UmrfNode umrf_diff = umrf_json_converter::fromUmrfJsonStr(umrf_graph_diff_msg.umrf_json);
-    //       umrf_graph_diffs.emplace_back(umrf_graph_diff_msg.operation, umrf_diff);
-    //     }
-
-    //     ae_.modifyGraph(msg->umrf_graph_name, umrf_graph_diffs);
-    //   }
-    //   catch(const std::exception& e)
-    //   {
-    //     RCLCPP_INFO(this->get_logger(), std::string(e.what()).c_str());
-    //   }
-    // }
   }
   catch(const std::exception& e)
   {
     RCLCPP_INFO(this->get_logger(), std::string(e.what()).c_str());
   }
+
+  /* * * * * * * * * * * * * * * * * * * * * * *
+   * Stop graph
+   * * * * * * * * * * * * * * * * * * * * * * */
 
   void UmrfGraphStopCb(const UmrfGraphStop::SharedPtr msg)
   {
@@ -215,12 +202,86 @@ private:
     }
   }
 
+  /* * * * * * * * * * * * * * * * * * * * * * *
+   * Pause graph
+   * * * * * * * * * * * * * * * * * * * * * * */
+
   void UmrfGraphPauseCb(const UmrfGraphPause::SharedPtr msg)
   {
+    RCLCPP_INFO(this->get_logger(), "Received request to pause UMRF graph: %s", msg->umrf_graph_name.c_str());
+
+    // If the wake word was not found then return
+    if (!containsWakeWord(msg->targets))
+    {
+      RCLCPP_INFO(this->get_logger(), "The pause message was not targeted at this Action Engine.");
+      return;
+    }
+
+    RCLCPP_INFO(this->get_logger(), "Pausing UMRF graph '%s' ...", msg->umrf_graph_name.c_str());
+    try
+    {
+      ae_->pauseUmrfGraph(msg->umrf_graph_name);
+      RCLCPP_INFO(this->get_logger(), "UMRF graph '%s' paused.", msg->umrf_graph_name.c_str());
+    }
+    catch(const std::exception& e)
+    {
+      RCLCPP_INFO(this->get_logger(), std::string(e.what()).c_str());
+    }
   }
+
+  /* * * * * * * * * * * * * * * * * * * * * * *
+   * Resume graph
+   * * * * * * * * * * * * * * * * * * * * * * */
 
   void UmrfGraphResumeCb(const UmrfGraphResume::SharedPtr msg)
   {
+    RCLCPP_INFO(this->get_logger(), "Received request to resume UMRF graph: %s", msg->umrf_graph_name.c_str());
+
+    // If the wake word was not found then return
+    if (!containsWakeWord(msg->targets))
+    {
+      RCLCPP_INFO(this->get_logger(), "The resume message was not targeted at this Action Engine.");
+      return;
+    }
+
+    RCLCPP_INFO(this->get_logger(), "Resuming UMRF graph '%s' ...", msg->umrf_graph_name.c_str());
+    try
+    {
+      ae_->resumeUmrfGraph(msg->umrf_graph_name);
+      RCLCPP_INFO(this->get_logger(), "UMRF graph '%s' resumed.", msg->umrf_graph_name.c_str());
+    }
+    catch(const std::exception& e)
+    {
+      RCLCPP_INFO(this->get_logger(), std::string(e.what()).c_str());
+    }
+  }
+
+  /* * * * * * * * * * * * * * * * * * * * * * *
+   * Modify graph
+   * * * * * * * * * * * * * * * * * * * * * * */
+
+  void UmrfGraphModifyCb(const UmrfGraphModify::SharedPtr msg)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received request to modify UMRF graph: %s", msg->umrf_graph_name.c_str());
+
+    // If the wake word was not found then return
+    if (!containsWakeWord(msg->targets))
+    {
+      RCLCPP_INFO(this->get_logger(), "The modification message was not targeted at this Action Engine.");
+      return;
+    }
+
+    RCLCPP_INFO(this->get_logger(), "Modifying UMRF graph '%s' ...", msg->umrf_graph_name.c_str());
+    try
+    {
+      UmrfGraph modified_graph = umrf_json::fromUmrfGraphJsonStr(msg->modified_graph);
+      ae_->modifyGraph(modified_graph, msg->continue_from);
+      RCLCPP_INFO(this->get_logger(), "UMRF graph '%s' modified.", msg->umrf_graph_name.c_str());
+    }
+    catch(const std::exception& e)
+    {
+      RCLCPP_INFO(this->get_logger(), std::string(e.what()).c_str());
+    }
   }
 
   void umrfGraphGetCb(const UmrfGraphGet::Request::SharedPtr, const UmrfGraphGet::Response::SharedPtr response)
@@ -255,6 +316,7 @@ private:
   rclcpp::Subscription<UmrfGraphStop>::SharedPtr   umrf_graph_stop_sub_;
   rclcpp::Subscription<UmrfGraphPause>::SharedPtr  umrf_graph_pause_sub_;
   rclcpp::Subscription<UmrfGraphResume>::SharedPtr umrf_graph_resume_sub_;
+  rclcpp::Subscription<UmrfGraphModify>::SharedPtr umrf_graph_modify_sub_;
   rclcpp::Publisher<UmrfGraphFeedback>::SharedPtr  umrf_graph_feedback_pub;
 
   std::thread feedback_reader_thread_;

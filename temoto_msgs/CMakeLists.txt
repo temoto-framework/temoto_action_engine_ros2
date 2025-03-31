@@ -22,7 +22,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/UmrfGraphPause.msg"
   "msg/UmrfGraphResume.msg"
   "msg/UmrfGraphModify.msg"
-  "msg/UmrfGraphModifier.msg"
   "msg/UmrfGraphFeedback.msg"
 
   "srv/UmrfGraphGet.srv"
