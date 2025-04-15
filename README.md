@@ -4,20 +4,17 @@ ROS2 wrapper for TeMoto Action Engine
 ## Installation Instructions
 ```bash
 # Get the dependencies
-sudo apt install libboost-all-dev
+chmod +x setup.sh
+
+./setup.sh
+
+source ~/.bashrc
 ```
 
 ```bash
-# Go to the source folder your ROS2 workspace
-cd <PATH-TO-YOUR-ROS2-WS>/src
-
-# Download this repository
-git clone --recursive https://github.com/temoto-framework/temoto_action_engine_ros2
-
-# Build it
-cd <PATH-TO-YOUR-ROS2-WS>
-source /opt/ros/<YOUR-ROS2-DISTRO>/setup.bash
-colcon build
+temoto-build
+temoto-start
+temoto-shell
 ```
 
 ### In Progress

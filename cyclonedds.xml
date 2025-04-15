@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CycloneDDS xmlns="https://cdds.io/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
+    <Domain id="any">
+        <General>
+            <Interfaces>
+                <NetworkInterface name="wg0"/>
+            </Interfaces>
+        </General>
+        <Discovery>
+            <Peers>
+                <Peer address="10.10.0.4"/>
+                <Peer address="127.0.0.1"/>
+
+                <!-- spot -->
+                <Peer address="10.159.65.106"/>   
+
+                <!-- mine -->
+                <Peer address="10.159.65.167"/>  
+                
+            </Peers>
+            <ParticipantIndex>auto</ParticipantIndex>
+            <MaxAutoParticipantIndex>100</MaxAutoParticipantIndex>
+        </Discovery>
+    </Domain>
+</CycloneDDS>

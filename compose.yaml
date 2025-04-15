@@ -1,0 +1,40 @@
+services:
+  # main container
+  temoto:
+    image: temoto
+    container_name: temoto-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+      ssh:
+        - default
+    profiles:
+      - temoto
+    env_file:
+      - variables.env
+    environment:
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_VISIBLE_DEVICES=all
+      - QT_X11_NO_MITSHM=1
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - CYCLONEDDS_URI=/root/cyclonedds.xml
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /dev/dri:/dev/dri
+      - ${HOME}/.Xauthority:/root/.Xauthority:rw
+      - ../temoto_docker:/root/temoto_docker
+      - ../temoto_actions:/root/temoto_ws/src/temoto_action_engine_ros2/examples/temoto_actions # mountthe temoto_demo_resources instead
+
+    network_mode: host
+    stdin_open: true
+    tty: true
+    # add devices to the container
+    # devices:
+    #   - /dev/hokuyo:/dev/hokuyo
+    #   - /dev/input/js0:/dev/input/js0
+    # run the entrypoint script
+    entrypoint: /entrypoint.sh
+    

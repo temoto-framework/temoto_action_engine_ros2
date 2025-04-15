@@ -1,0 +1,39 @@
+temoto-start(){
+    #add xhost permissions for docker to use display
+    # xhost +local:docker
+    # echo "added docker xhost permissions"
+    docker compose --profile temoto up -d
+}
+
+temoto-stop(){
+    # stop the container and remove it
+    docker compose --profile temoto down
+}
+
+temoto-shell() {
+    # open a shell in the container
+    docker exec -ti temoto-container bash -l
+}
+
+temoto-build() {    
+    # if the container is running, stop it
+    if [ "$(docker ps -q -f name=temoto-container)" ]; then
+        echo "stopping container temoto-container..."
+        docker compose --profile temoto down
+    fi
+    # build the container
+    docker compose --profile temoto build
+       
+}
+
+temoto-dir() {
+    # Set the directory of the docker_workshop repo on the host
+	# Usage: temoto-dir path_to_temoto_docker_dir
+	# Alternatively, add it to your .bashrc for convenience
+    export TEMOTO_DIRECTORY=$1
+}
+
+temoto-log() {
+    # view the logs of the picogk container
+    docker logs temoto-container
+}
