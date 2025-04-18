@@ -155,13 +155,13 @@ private:
     if (msg->umrf_graph_json.empty())
     {
       graph_name = msg->umrf_graph_name;
-      ae_->executeUmrfGraph(graph_name);
+      ae_->startGraph(graph_name);
     }
     else
     {
       UmrfGraph umrf_graph = umrf_json::fromUmrfGraphJsonStr(msg->umrf_graph_json);
       graph_name = umrf_graph.getName();
-      ae_->executeUmrfGraphA(umrf_graph, "on_true", bool(msg->name_match_required));
+      ae_->startGraphA(umrf_graph, "on_true", bool(msg->name_match_required));
     }
 
     wait_thread_pool_.push_back(std::move(std::thread([&, gn = graph_name]
@@ -193,7 +193,7 @@ private:
     RCLCPP_INFO(this->get_logger(), "Stopping UMRF graph '%s' ...", msg->umrf_graph_name.c_str());
     try
     {
-      ae_->stopUmrfGraph(msg->umrf_graph_name);
+      ae_->stopGraph(msg->umrf_graph_name);
       RCLCPP_INFO(this->get_logger(), "UMRF graph '%s' stopped.", msg->umrf_graph_name.c_str());
     }
     catch(const std::exception& e)
@@ -220,7 +220,7 @@ private:
     RCLCPP_INFO(this->get_logger(), "Pausing UMRF graph '%s' ...", msg->umrf_graph_name.c_str());
     try
     {
-      ae_->pauseUmrfGraph(msg->umrf_graph_name);
+      ae_->pauseGraph(msg->umrf_graph_name);
       RCLCPP_INFO(this->get_logger(), "UMRF graph '%s' paused.", msg->umrf_graph_name.c_str());
     }
     catch(const std::exception& e)
@@ -247,7 +247,7 @@ private:
     RCLCPP_INFO(this->get_logger(), "Resuming UMRF graph '%s' ...", msg->umrf_graph_name.c_str());
     try
     {
-      ae_->resumeUmrfGraph(msg->umrf_graph_name);
+      ae_->resumeGraph(msg->umrf_graph_name);
       RCLCPP_INFO(this->get_logger(), "UMRF graph '%s' resumed.", msg->umrf_graph_name.c_str());
     }
     catch(const std::exception& e)
